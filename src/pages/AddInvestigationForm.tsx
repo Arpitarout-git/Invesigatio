@@ -175,8 +175,7 @@
 
 
 import React, { useState, useCallback } from 'react';
-// Assuming you have exported InputField and Dropdown from separate files 
-// or from an index.ts file in your components directory
+import { useNavigate } from 'react-router-dom';
 import { InputField } from '../components/Inputfield';
 import { Dropdown } from '../components/Dropdown'; 
 import TubeColorSelector from '../components/TubeColorSelector';
@@ -195,7 +194,12 @@ const initialFormState: InvestigationForm = {
   externalTestId: 'Example: For Test ID', selectedColors: [],
 };
 
-const AddInvestigationForm: React.FC = () => {
+// Added props interface for onCancel
+interface AddInvestigationFormProps { onCancel?: () => void; }
+
+// Updated component to accept optional onCancel and fallback to navigate(-1)
+const AddInvestigationForm: React.FC<AddInvestigationFormProps> = ({ onCancel }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<InvestigationForm>(initialFormState);
 
   // --- Universal Change Handler ---
@@ -216,6 +220,10 @@ const AddInvestigationForm: React.FC = () => {
     e.preventDefault();
     console.log('Investigation Form Submitted:', formData);
     // TODO: Implement Axios call to POST data to your PostgreSQL backend
+  };
+
+  const handleCancel = () => {
+    if (onCancel) onCancel(); else navigate('/investigation-master');
   };
 
   // Helper for units (assuming sample temperature uses different units like °C)
@@ -330,6 +338,7 @@ const AddInvestigationForm: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
             <button
               type="button"
+              onClick={handleCancel}
               style={{
                 padding: '10px 20px',
                 marginRight: '10px',
